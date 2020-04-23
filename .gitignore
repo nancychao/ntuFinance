@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+coding/data/TEJ輸出檔案/0318版/上市2006_2018.xlsx
+coding/data/TEJ輸出檔案/0318版/上櫃2006_2018.xlsx
+coding/data/TEJ輸出檔案/0318版/下市2006_2018.xlsx
+coding/data/TEJ輸出檔案/0318版/下櫃2006_2018.xlsx
+coding/data/TEJ輸出檔案/0318版/原始資料_xls/上市2006_2018.xls
+coding/data/TEJ輸出檔案/0318版/原始資料_xls/上櫃2006_2018.xls
+coding/data/TEJ輸出檔案/0318版/原始資料_xls/下市2006_2018.xls
+coding/data/TEJ輸出檔案/0318版/原始資料_xls/下櫃2006_2018.xls

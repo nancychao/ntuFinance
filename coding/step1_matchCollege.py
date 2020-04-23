@@ -83,6 +83,29 @@ class CleanData():
         return df
 
     @staticmethod
+    def makeleftTable(df):  # 建立各年度、各公司、董監經理人的總表
+        cols = ['公司代碼', '簡稱', '上市別', 'TSE新產業名',
+        '資料源年月', '董監經理人姓名', '姓名代碼', '資料源', '資料截止日',
+        '職稱', '身份別', '初任日期--董監事', '初任日期--經理人', '年資--董監事',
+        '年資--經理人', '教育程度', '財務', '會計', '法務', '身份代碼', '獨立代碼',
+        '職位代碼', '會計主管', '財務主管', '類別代碼', '重整代碼',
+        '初次選任日期--董監事', '選就任日', '沿用日'
+        ]
+
+        df2 = df.copy()[cols].drop_duplicates()        
+        df2['公司代碼'] = df2['公司代碼'].apply(lambda x :str(x).strip())
+        df2['簡稱'] = df2['簡稱'].apply(lambda x :x.strip())
+        df2['上市別'] = df2['上市別'].apply(lambda x :x.strip())
+        df2['董監經理人姓名'] = df2['董監經理人姓名'].apply(lambda x :x.strip())
+        df2['資料源'] = df2['資料源'].apply(lambda x :str(x).strip())
+        df2['職稱'] = df2['職稱'].apply(lambda x :x.strip())
+        df2['身份別'] = df2['身份別'].apply(lambda x :x.strip())
+        df2['教育程度'] = df2['教育程度'].apply(lambda x :x.strip())
+
+        
+        return df2
+
+    @staticmethod
     def dropDupAndMatchCollege(df):
         # 行次： A:主要學經歷說明 B:目前兼任說明 (刪除 目前兼任說明)
         df = df[df['行次'].str.contains("A")]
@@ -182,16 +205,35 @@ class CleanData():
 
 
 i = 0
+# needIndustry = ['M2800 金融業']
 for industry in needIndustry: 
     i += 1
     print('第{i}個產業：{industry}'.format(i=i,industry=industry))
     industryData = CleanData.readIndsData(industry)    # 讀取產業TEJ輸出raw data
+    # print(industryData)
+    leftTable = CleanData.makeleftTable(industryData)  # 建立總表
+    # print(leftTable)
+    
     df = CleanData.dropDupAndMatchCollege(industryData) # 刪除重複值&配對學院
     df = CleanData.stripColumns(df) # 刪除各欄位前後的空白
     df = CleanData.joinIntoOneRow(df) # 合併同年度、同公司、同姓名代碼成一列
     df = CleanData.crtOrMergeNewColumns(df) #新增欄位或merge
-    df = CleanData.sortColumns(df) # 將columns依想要的依序排列
-    df.to_excel(dataPath + f'1_學歷配對_{industry}_{mmdd}.xlsx',
+    leftTable = CleanData.crtOrMergeNewColumns(leftTable)
+    # df = CleanData.sortColumns(df) # 將columns依想要的依序排列
+    cols = ['公司代碼', '公司代碼簡稱', '上市別', 'TSE新產業名', '金融次產業', '銀行分類',
+            '資料源年月', '資料源年', '董監經理人姓名', '姓名代碼', '資料源', '資料截止日',
+            '職稱', '身份別', '初任日期--董監事', '初任日期--經理人', '年資--董監事',
+            '年資--經理人', '教育程度', '財務', '會計', '法務', '身份代碼', '獨立代碼',
+            '職位代碼', '職位代碼_排序', '會計主管', '財務主管', '類別代碼', '重整代碼',
+            '初次選任日期--董監事', '選就任日', '沿用日'
+            ]
+    # print(leftTable)
+    wholedf = leftTable.merge(df, how='left', on = cols)
+    wholedf = CleanData.sortColumns(wholedf)
+    wholedf['學院'] = wholedf['學院'].fillna('無法辨識')
+    # print(df)
+    # print(wholedf)
+    wholedf.to_excel(dataPath + f'1_學歷配對_{industry}_{mmdd}.xlsx',
                             encoding = 'utf_8_sig', index = False
                 )
 # industryData
