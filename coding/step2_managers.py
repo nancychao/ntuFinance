@@ -18,7 +18,7 @@ class ManagerFunc():
     
     @staticmethod
     def openIndsData(industry):  # 讀取學歷配對資料
-        df = pd.read_excel(dataPath + '1_學歷配對_{industry}_{mmdd}.xlsx'.format(industry=industry,mmdd=mmdd))           
+        df = pd.read_excel(dataPath + f'1.2_學院更新_{industry}_{mmdd}.xlsx')           
         return df
     
     @staticmethod
@@ -108,22 +108,34 @@ class ManagerFunc():
 
                 else:    #如果都沒有人的職稱包含關鍵字：就return全部
                     return df
-              
+
+    @staticmethod
+    def getCeoTopFilter(df): # 選擇CEO篩選器
+        
+        if len(df.index) == 1:  #如果該職稱只有一個人，則return，例如：總裁/法遵長
+            return df
+        
+        else: # 如果該職稱有很多人
+            df = df[df['職位代碼_排序'] == df['職位代碼_排序'].min()]  # 選擇職位排序較前面者(較高階)
+            return df
+
+
     @staticmethod        
     def getMgsTopMain(df):
         global managerDict
 
         # 依照職位不同進行初步篩選
         if position == '總經理':
-            df_position = df[df['職位代碼_排序'] == 1]   # 此職位以總裁為優先
-            if len(df_position.index) == 0:
-                df_position = df[df['職位代碼_排序'] == 2]  # 如果沒有總裁職位者，再選擇總經理、執行長
-
+            df_position = df[(df['職位代碼_排序'] == 1)|(df['職位代碼_排序'] == 2) ]   # 此職位以總裁(1)為優先  # 如果沒有總裁職位者，再選擇總經理、執行長(2)
+            df_position.groupby(['資料源年月','公司代碼']).apply(func = ManagerFunc.getCeoTopFilter).reset_index(drop=True)
+            
             return df_position.sort_values(["資料源年月", "公司代碼"])
+
 
         elif position == '財務長':
             title = managerDict['財務長']['身份別']
             df_position = df[df['身份別'].str.contains(title, na=False)]
+            
             
         else:
             df_position = df[df['職稱'].str.contains(managerDict[position]['職稱'], na=False)]
@@ -201,7 +213,7 @@ class ManagerFunc():
     def countAndMergeNumPro(df):
         global managerTable
 
-        if len(df.index) == 0:
+        if len(df.index) == 0:  #如果此類高階經理人，無資料
             managerTable[position+'_符合人數'] = 0
             managerTable[position+'_不符合人數'] = 0
             managerTable[position+'_無法辨識學院人數'] = 0
@@ -219,6 +231,8 @@ class ManagerFunc():
             #         return '是'
             #    else:
             #         return '否'
+            
+            df.loc[(df['學院'] == '無法辨識')&(df['教育程度'] == '高中職以下'),'專業度' ] = '否'
 
 
             managerPro2 = df.groupby(['上市別','公司代碼簡稱','資料源年月','專業度']).size().reset_index(name='人數')
@@ -275,24 +289,24 @@ i = 0
 
 for industry in needIndustry:
     i += 1
-    print('第{i}個產業：{industry}'.format(i=i,industry=industry))
-    industryProCollege = industryCollegeDict[industry]
-    managerDict = ManagerFunc.getManagerDict()
+    print(f'第{i}個產業：{industry}')
+    industryProCollege = industryCollegeDict[industry] # 各產業專業
+    managerDict = ManagerFunc.getManagerDict()   # 各高階經理人職位條件
     
-    industryData = ManagerFunc.openIndsData(industry)
-    managerTable = ManagerFunc.crtManagerTable(industryData)
+    industryData = ManagerFunc.openIndsData(industry)  # 讀檔
+    managerTable = ManagerFunc.crtManagerTable(industryData) # 建立總表
     
     for position in managerDict:
         print(position)
-        df = ManagerFunc.getMgsTopMain(industryData)
-        managerTable = ManagerFunc.countAndMergeNumPeople(df)
-        managerTable = ManagerFunc.getAndMergeInfo(df)
-        managerTable = ManagerFunc.countAndMergeNumPro(df)
-        managerTable = ManagerFunc.getLabelAndScore()
-    managerTable = ManagerFunc.getAllMgsScore()
+        df = ManagerFunc.getMgsTopMain(industryData)  # 找各職位的高階經理人
+        managerTable = ManagerFunc.countAndMergeNumPeople(df) # 計算該職位人數
+        managerTable = ManagerFunc.getAndMergeInfo(df)  # merge該經理人其他資訊
+        managerTable = ManagerFunc.countAndMergeNumPro(df) # 計算符合、不符合、無法辨識學院人數
+        managerTable = ManagerFunc.getLabelAndScore() # 取得該職位燈號&分數
+    managerTable = ManagerFunc.getAllMgsScore() # 計算所有高階經理人分數
 
 
-    managerTable.to_excel(dataPath + '2_高階經理人_{industry}_{mmdd}.xlsx'.format(industry=industry,mmdd=mmdd),
+    managerTable.to_excel(dataPath + f'2_高階經理人_{industry}_{mmdd}.xlsx',
                                 encoding = 'utf_8_sig', index = False
                              )
 #     managerTable

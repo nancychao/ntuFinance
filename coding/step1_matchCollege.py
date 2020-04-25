@@ -230,10 +230,12 @@ for industry in needIndustry:
     # print(leftTable)
     wholedf = leftTable.merge(df, how='left', on = cols)
     wholedf = CleanData.sortColumns(wholedf)
+    wholedf['學經歷及目前兼任說明'] = wholedf['學經歷及目前兼任說明'].fillna('無')
     wholedf['學院'] = wholedf['學院'].fillna('無法辨識')
+    # wholedf['教育程度'] = wholedf['教育程度'].fillna('無')
     # print(df)
     # print(wholedf)
-    wholedf.to_excel(dataPath + f'1_學歷配對_{industry}_{mmdd}.xlsx',
+    wholedf.to_excel(dataPath + f'1.0_學歷配對_{industry}_{mmdd}.xlsx',
                             encoding = 'utf_8_sig', index = False
                 )
 # industryData
