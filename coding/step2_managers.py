@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import plotly_express as px
 from step0_settings import domainPath, dataPath, industryCollegeDict, mmdd, needIndustry 
 
 pd.options.display.max_columns = 100
@@ -127,9 +126,9 @@ class ManagerFunc():
         # 依照職位不同進行初步篩選
         if position == '總經理':
             df_position = df[(df['職位代碼_排序'] == 1)|(df['職位代碼_排序'] == 2) ]   # 此職位以總裁(1)為優先  # 如果沒有總裁職位者，再選擇總經理、執行長(2)
-            df_position.groupby(['資料源年月','公司代碼']).apply(func = ManagerFunc.getCeoTopFilter).reset_index(drop=True)
+            df_final = df_position.groupby(['資料源年月','公司代碼']).apply(func = ManagerFunc.getCeoTopFilter).reset_index(drop=True)
             
-            return df_position.sort_values(["資料源年月", "公司代碼"])
+            return df_final.sort_values(["資料源年月", "公司代碼"])
 
 
         elif position == '財務長':

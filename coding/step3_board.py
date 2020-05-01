@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import plotly_express as px
 from step0_settings import domainPath, dataPath, industryCollegeDict, mmdd, needIndustry 
 
 pd.options.display.max_columns = 100
@@ -14,9 +13,9 @@ boardTable = pd.DataFrame()
 class BoardFunc():
     @staticmethod
     def openIndsData(industry):
-        # dataPath = os.getcwd() + '\\data\\'
-        df = pd.read_excel(dataPath + '1_學歷配對_{industry}_{mmdd}.xlsx'.format(industry=industry,mmdd=mmdd))        
+        df = pd.read_excel(dataPath + f'1.2_學院更新_{industry}_{mmdd}.xlsx')        
         return df
+
     @staticmethod
     def getProDict():
         global industry, proDict
@@ -118,6 +117,10 @@ class BoardFunc():
             #    else:
             #         return '否'
 
+            # 若學院是無法辨識，且教育程度：高中職以下 → 不符合，因為覺得高中或以下學歷並沒有專業科目課程
+            df2.loc[(df2['學院'] == '無法辨識')&(df2['教育程度'] == '高中職以下'),'專業度' ] = '否'
+
+
             
             # 整合TEJ整理結果&學院專業結果
             df = df.merge(df2, how='left', on=list(df)[:-1])
@@ -175,7 +178,7 @@ for industry in needIndustry:
     boardTable = BoardFunc.countAndMergeSpecialty(directors)
     boardTable = BoardFunc.getAllBoardScore()
     boardTable
-    boardTable.to_excel(dataPath + '3_獨立董事_'+industry+mmdd+'.xlsx',
+    boardTable.to_excel(dataPath + f'3_獨立董事_{industry}_{mmdd}.xlsx',
                                     encoding = 'utf_8_sig', index = False
                                  )
 
