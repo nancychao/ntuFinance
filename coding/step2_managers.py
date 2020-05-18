@@ -17,15 +17,17 @@ class ManagerFunc():
     
     @staticmethod
     def openIndsData(industry):  # 讀取學歷配對資料
-        df = pd.read_excel(dataPath + f'1.2_學院更新_{industry}_{mmdd}.xlsx')           
+        df = pd.read_excel(dataPath + f'1.2_學院更新_{industry}_0502.xlsx')           
         return df
     
+
+
     @staticmethod
     def getManagerDict():  # 各產業高階經理人的關鍵字、專業學院
         global industryProCollege
         managerDict = {'總經理':
-                           {'包含':'總經理|執行長',
-                            '不包含':'副總經理|總經理室|總經理辦公室|執行長室',
+                           {'包含':'總經理|執行長|總裁',
+                            '不包含':'副總經理|總經理室|總經理辦公室|執行長室|總裁室|事業群執行長|處執行長|事業執行長|執行長特助|總經理特助|分公司總經理|中心總經理|營運總經理|功能性總經理|處總經理|區總經理|部總經理|群總經理|部代總經理|部門總經理|廠總經理|體總經理|單位總經理|業務總經理|事業總經理|處1總經理|處I總經理|處II總經理|行政總經理|文創總經理|駐地總經理|營運總經理|嘉鎂總經理|電子總經理|廣禾總經理|新力總經理|重慶總經理|深圳總經理|和進總經理|和昌總經理|資訊總經理|GWC總經理|中山上詮總經理|台北總經理|昆山總經理|HPIW總經理|子公司長瑞總經理|子公司蘇州長瑞光電總經理|上海合晶總經理|SBEH總經理|客戶總經理|SAC總經理|上海鈺太芯總經理|享慶科技總經理|關係企總經理',
                             '專業學院':'管理學院|{industryProCollege}'.format(industryProCollege=industryProCollege)
                             },
                        '財務長':
@@ -125,8 +127,8 @@ class ManagerFunc():
 
         # 依照職位不同進行初步篩選
         if position == '總經理':
-            df_position = df[(df['職位代碼_排序'] == 1)|(df['職位代碼_排序'] == 2) ]   # 此職位以總裁(1)為優先  # 如果沒有總裁職位者，再選擇總經理、執行長(2)
-            df_final = df_position.groupby(['資料源年月','公司代碼']).apply(func = ManagerFunc.getCeoTopFilter).reset_index(drop=True)
+            df_position = df[(df['職位代碼_排序'] == 1)|(df['職位代碼_排序'] == 2)|(df['職位代碼_排序'] == 3) ]   # 此職位以總裁(1)為優先  # 如果沒有總裁職位者，再選擇總經理、執行長(2)
+            df_final = df_position.groupby(['資料源年月','公司代碼']).apply(func = ManagerFunc.getMgsTopFilter).reset_index(drop=True)
             
             return df_final.sort_values(["資料源年月", "公司代碼"])
 

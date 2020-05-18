@@ -8,7 +8,7 @@ pd.options.display.max_columns = 100
 pd.options.display.max_rows = 2300  #調整pandas輸出display列數
 pd.set_option('display.max_colwidth',1000)  #設定每個欄位dsiplay字數長度
 
-mmdd = '0428'
+
 i = 0
 df = pd.DataFrame()
 # df.columns = ['公司代碼', '公司代碼簡稱', '上市別', 'TSE新產業名', '金融次產業', '銀行分類', '資料源年月', '資料源年']
@@ -17,7 +17,7 @@ for industry in needIndustry:
     i += 1
     print('第'+str(i)+'個產業：'+industry)
     manager = pd.read_excel(dataPath + f'2_高階經理人_{industry}_{mmdd}.xlsx') 
-    board = pd.read_excel(dataPath + f'3_獨立董事_{industry}_{mmdd}.xlsx') 
+    board = pd.read_excel(dataPath + f'3_獨立董事_{industry}_0502.xlsx') 
     mix = manager.merge(board, how = 'outer', on = list(manager)[:8])
     print('第'+str(i)+'個產業：'+industry+'  '+str(mix.shape))
     df = df.append(mix)

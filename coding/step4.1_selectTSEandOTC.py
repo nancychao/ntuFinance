@@ -3,7 +3,6 @@ import numpy as np
 import os
 from step0_settings import domainPath, dataPath, mmdd 
 
-mmdd = '0428'
 
 df = pd.read_excel(dataPath + f'4.0_經理人+獨董_{mmdd}.xlsx') 
 df = df[(df['上市別'] == 'TSE')|(df['上市別'] == 'OTC')]
