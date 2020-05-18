@@ -3,7 +3,7 @@ import numpy as np
 import os
 from step0_settings import domainPath, dataPath 
 
-stockRatioDf = pd.read_excel(dataPath +'電子業內部人持股變化(月資料).xlsx')
+stockRatioDf = pd.read_excel(dataPath +'0_電子業內部人持股變化(月資料).xlsx')
 stockRatioDf.rename(columns = {'公司代碼' : '公司代碼簡稱'}, inplace = True)
 stockRatioDf['公司代碼'] = stockRatioDf['公司代碼簡稱'].apply(lambda x : int(x[:4]))
 stockRatioDf['資料源年'] = stockRatioDf['年月日'].apply(lambda x : int(x.strftime('%Y')))
@@ -21,7 +21,7 @@ stockAgg = stockRatioDf.groupby(['公司代碼簡稱', '持股人姓名','公司
 }).reset_index()
 # stockAgg
 
-stockAgg.to_excel(dataPath + '2.0_電子業內部人持股變化(年資料).xlsx',
+stockAgg.to_excel(dataPath + '0.1_電子業內部人持股變化(年資料).xlsx',
                         encoding = 'utf_8_sig', index = False
             )
 print('------------------------------完成-----------------------------------------------')

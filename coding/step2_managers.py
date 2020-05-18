@@ -17,7 +17,7 @@ class ManagerFunc():
     
     @staticmethod
     def openIndsData(industry):  # 讀取學歷配對資料
-        df = pd.read_excel(dataPath + f'1.2_學院更新_{industry}_0502.xlsx')           
+        df = pd.read_excel(dataPath + f'1.3_新增經理人持股數_{industry}_{mmdd}.xlsx')           
         return df
     
 
@@ -110,15 +110,15 @@ class ManagerFunc():
                 else:    #如果都沒有人的職稱包含關鍵字：就return全部
                     return df
 
-    @staticmethod
-    def getCeoTopFilter(df): # 選擇CEO篩選器
+    # @staticmethod
+    # def getCeoTopFilter(df): # 選擇CEO篩選器
         
-        if len(df.index) == 1:  #如果該職稱只有一個人，則return，例如：總裁/法遵長
-            return df
+    #     if len(df.index) == 1:  #如果該職稱只有一個人，則return，例如：總裁/法遵長
+    #         return df
         
-        else: # 如果該職稱有很多人
-            df = df[df['職位代碼_排序'] == df['職位代碼_排序'].min()]  # 選擇職位排序較前面者(較高階)
-            return df
+    #     else: # 如果該職稱有很多人
+    #         df = df[df['職位代碼_排序'] == df['職位代碼_排序'].min()]  # 選擇職位排序較前面者(較高階)
+    #         return df
 
 
     @staticmethod        
@@ -179,6 +179,10 @@ class ManagerFunc():
             managerTable[position+'_身份別'] = np.nan
             managerTable[position+'_學經歷及目前兼任說明'] = np.nan
             managerTable[position+'_學院'] = np.nan
+            managerTable[position+'_期初股數'] = np.nan
+            managerTable[position+'_期末股數'] = np.nan
+            managerTable[position+'_期初股數(合計)'] = np.nan
+            managerTable[position+'_期末股數(合計)'] = np.nan
             
             return managerTable        
         
@@ -194,7 +198,12 @@ class ManagerFunc():
                                                                                   '職稱' : lambda x : '&'.join(x),
                                                                                   '身份別': lambda x : '&'.join(x),
                                                                                   '學經歷及目前兼任說明' : lambda x : '#'.join(x),
-                                                                                  '學院': lambda x : '#'.join(x)
+                                                                                  '學院': lambda x : '#'.join(x),
+                                                                                  '期初股數': lambda x : sum(x),
+                                                                                  '期末股數': lambda x : sum(x),
+                                                                                  '期初股數(合計)': lambda x : sum(x),
+                                                                                  '期末股數(合計)': lambda x : sum(x),
+                                                                                  
                                                                                 }).reset_index()
             managerNameId.rename(columns = {'姓名代碼' : position+'_姓名代碼',
                                             '董監經理人姓名':position+'_姓名',
@@ -204,7 +213,11 @@ class ManagerFunc():
                                             '職稱' : position+'_職稱',
                                             '身份別' : position+'_身份別',
                                             '學經歷及目前兼任說明' : position+'_學經歷及目前兼任說明',
-                                            '學院' : position+'_學院'
+                                            '學院' : position+'_學院',
+                                            '期初股數':position+'_期初股數',
+                                            '期末股數':position+'_期末股數',
+                                            '期初股數(合計)':position+'_期初股數(合計)',
+                                            '期末股數(合計)':position+'_期末股數(合計)',
 
                                            }, inplace = True)
             managerTable = managerTable.merge(managerNameId, how='left', on=['上市別','公司代碼簡稱','資料源年月'])
